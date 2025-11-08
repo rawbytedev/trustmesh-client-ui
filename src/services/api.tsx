@@ -1,5 +1,13 @@
-export async function getEscrowEvents(escrowId: string) {
-  const res = await fetch(`https://trustmesh-server.up.railway.app/escrows/${escrowId}/events`);
-  if (!res.ok) throw new Error("Failed to fetch events");
-  return res.json();
+import axios from "axios";
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_SERVER_URL ?? "http://localhost:8000",
+});
+
+export async function disputeEscrow(escrowId: number) {
+  return api.post("/dispute", { escrowId });
+}
+
+export async function releaseFunds(escrowId: number) {
+  return api.post("/release", { escrowId });
 }

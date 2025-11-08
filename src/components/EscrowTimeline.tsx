@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react";
-import { getEscrowEvents } from "../services/api";
+import { api } from "../services/api";
 
-interface Event {
-  event_type: string;
-  created_at: string;
-  payload?: any;
+interface EventRow {
+  key: string; // e.g. "lk:123"
+  value: string; // JSON string per your storage layer
 }
 
-export function EscrowTimeline({ escrowId }: { escrowId: string }) {
-  const [events, setEvents] = useState<Event[]>([]);
+export function EscrowTimeline({ escrowId }: { escrowId: number }) {
+  const [events, setEvents] = useState<EventRow[]>([]);
 
   useEffect(() => {
-    getEscrowEvents(escrowId).then(setEvents);
+    (async () => {
+      const res = await api.get(`/escrow/${escrowId}`);
+      // server renders a page; better expose a JSON API:
+      // GET /api/escrow/:id -> { timeline: { "ec:1": "...", "lk:1": "..." } }
+    })();
   }, [escrowId]);
 
   return (
     <div>
-      <h3>Escrow #{escrowId} Progress</h3>
+      <h3>Escrow #{escrowId} Timeline</h3>
       <ul>
         {events.map((e, i) => (
           <li key={i}>
-            <strong>{e.event_type}</strong> at {new Date(e.created_at).toLocaleString()}
+            <strong>{e.key}</strong>
+            <pre>{e.value}</pre>
           </li>
         ))}
       </ul>
